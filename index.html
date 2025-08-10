@@ -86,7 +86,15 @@
 
 <div id="game">
   <div id="problem">Press Start</div>
-  <input id="answer" type="text" autocomplete="off" placeholder="Type answer" disabled />
+  <input
+    id="answer"
+    type="tel"
+    inputmode="numeric"
+    pattern="[0-9]*"
+    autocomplete="off"
+    placeholder="Type answer"
+    disabled
+  />
   <div id="feedback"></div>
   <div id="info">
     <div>Time: <span id="time">0</span>s</div>
