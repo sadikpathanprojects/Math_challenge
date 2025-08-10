@@ -77,7 +77,7 @@
   }
   #footer {
     margin-top: 32px;
-    font-size: 20px;
+    font-size: 24px;
     color: #555;
   }
 </style>
@@ -124,15 +124,20 @@
   }
 
   function generateProblem() {
-    // Simple add or subtract between 1-20
     const a = randInt(1, 20);
     const b = randInt(1, 20);
-    if (Math.random() < 0.5) {
+    const opRand = Math.random();
+
+    if (opRand < 0.4) {
+      // addition
       return { text: `${a} + ${b}`, answer: a + b };
-    } else {
-      // ensure no negative answers
+    } else if (opRand < 0.75) {
+      // subtraction - ensure no negative answer
       if (a >= b) return { text: `${a} - ${b}`, answer: a - b };
       else return { text: `${b} - ${a}`, answer: b - a };
+    } else {
+      // multiplication
+      return { text: `${a} × ${b}`, answer: a * b };
     }
   }
 
