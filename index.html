@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Quick Math Challenge</title>
+<style>
+  body {
+    margin: 0;
+    background: #121212;
+    color: #eee;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    user-select: none;
+  }
+  #game {
+    text-align: center;
+    background: #1e1e1e;
+    padding: 30px 40px;
+    border-radius: 12px;
+    box-shadow: 0 0 15px #0ff;
+    min-width: 280px;
+  }
+  #problem {
+    font-size: 64px;
+    margin-bottom: 20px;
+    font-weight: 700;
+    letter-spacing: 4px;
+  }
+  #answer {
+    font-size: 28px;
+    padding: 8px 12px;
+    width: 160px;
+    border-radius: 8px;
+    border: none;
+    text-align: center;
+    background: #333;
+    color: #eee;
+    outline: none;
+  }
+  #answer:focus {
+    box-shadow: 0 0 8px #0ff;
+  }
+  #info {
+    margin-top: 20px;
+    display: flex;
+    justify-content: space-between;
+    font-size: 20px;
+    font-weight: 600;
+  }
+  #info > div {
+    min-width: 100px;
+  }
+  #feedback {
+    margin-top: 14px;
+    height: 28px;
+    font-weight: 600;
+  }
+  #startBtn {
+    margin-top: 24px;
+    padding: 10px 24px;
+    font-size: 20px;
+    font-weight: 700;
+    background: #0ff;
+    border: none;
+    border-radius: 10px;
+    color: #121212;
+    cursor: pointer;
+    transition: background 0.3s ease;
+  }
+  #startBtn:hover {
+    background: #0cc;
+  }
+  #footer {
+    margin-top: 32px;
+    font-size: 20px;
+    color: #555;
+  }
+</style>
+</head>
+<body>
+
+<div id="game">
+  <div id="problem">Press Start</div>
+  <input id="answer" type="text" autocomplete="off" placeholder="Type answer" disabled />
+  <div id="feedback"></div>
+  <div id="info">
+    <div>Time: <span id="time">0</span>s</div>
+    <div>Score: <span id="score">0</span></div>
+  </div>
+  <button id="startBtn">Start</button>
+</div>
+
+<div id="footer">Created by Sadik Pathan</div>
+
+<script>
+  const problemEl = document.getElementById('problem');
+  const answerInput = document.getElementById('answer');
+  const feedbackEl = document.getElementById('feedback');
+  const timeEl = document.getElementById('time');
+  const scoreEl = document.getElementById('score');
+  const startBtn = document.getElementById('startBtn');
+
+  let score = 0;
+  let timeLeft = 60;
+  let timerId = null;
+  let currentProblem = null;
+  let gameRunning = false;
+
+  function randInt(min, max) {
+    return Math.floor(Math.random() * (max - min + 1)) + min;
+  }
+
+  function generateProblem() {
+    // Simple add or subtract between 1-20
+    const a = randInt(1, 20);
+    const b = randInt(1, 20);
+    if (Math.random() < 0.5) {
+      return { text: `${a} + ${b}`, answer: a + b };
+    } else {
+      // ensure no negative answers
+      if (a >= b) return { text: `${a} - ${b}`, answer: a - b };
+      else return { text: `${b} - ${a}`, answer: b - a };
+    }
+  }
+
+  function newProblem() {
+    currentProblem = generateProblem();
+    problemEl.textContent = currentProblem.text;
+    feedbackEl.textContent = '';
+    answerInput.value = '';
+    answerInput.focus();
+  }
+
+  function updateTimer() {
+    if (timeLeft > 0) {
+      timeLeft--;
+      timeEl.textContent = timeLeft;
+    } else {
+      endGame();
+    }
+  }
+
+  function startGame() {
+    if (gameRunning) return;
+    score = 0;
+    timeLeft = 60;
+    gameRunning = true;
+    scoreEl.textContent = score;
+    timeEl.textContent = timeLeft;
+    startBtn.disabled = true;
+    answerInput.disabled = false;
+    newProblem();
+    timerId = setInterval(() => {
+      updateTimer();
+    }, 1000);
+  }
+
+  function endGame() {
+    gameRunning = false;
+    clearInterval(timerId);
+    timerId = null;
+    feedbackEl.textContent = `Time's up! Your final score: ${score}`;
+    startBtn.disabled = false;
+    answerInput.disabled = true;
+    problemEl.textContent = 'Press Start';
+  }
+
+  function submitAnswer() {
+    if (!gameRunning) return;
+    const val = answerInput.value.trim();
+    if (val === '') return;
+    if (parseInt(val, 10) === currentProblem.answer) {
+      score++;
+      scoreEl.textContent = score;
+      feedbackEl.textContent = 'Correct! 🎉';
+      feedbackEl.style.color = '#0f0';
+      newProblem();
+    } else {
+      feedbackEl.textContent = 'Wrong, try again!';
+      feedbackEl.style.color = '#f44';
+    }
+  }
+
+  answerInput.addEventListener('keydown', e => {
+    if (e.key === 'Enter') {
+      submitAnswer();
+    }
+  });
+
+  startBtn.addEventListener('click', startGame);
+</script>
+
+</body>
+</html>
